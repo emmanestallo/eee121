@@ -1,4 +1,4 @@
-v,e,c = int(input()), int(input()), int(input()) 
+v,e,c = [int(i) for i in input().split(' ')]
 
 inf = 100000000
 
@@ -7,7 +7,9 @@ final_weights[c-1] = 0
 
 current_weights = final_weights 
 
-for pairs in range(e): 
-    node1, node2, weight = int(input), int(input()), int(input()) 
+edgeList = [] 
 
-print(final_weights)
+for pairs in range(e): 
+    edgeList.append([int(j) for j in input().split(' ')] + [False])
+
+print(edgeList)
