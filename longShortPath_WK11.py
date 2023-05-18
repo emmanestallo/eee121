@@ -15,22 +15,15 @@ def probeNode(node,startNode):
                 if adjMat[currNode][neighbor] + cost < final_weights[neighbor]: 
                     final_weights[neighbor] = adjMat[currNode][neighbor] + cost 
 
-def nextNode(arr): 
-    minVal = min(arr) 
-    minIdx = arr.index(minVal) 
-
-    return minIdx 
 
 v,e,c = [int(i) for i in input().split(' ')]
 
 inf = 100000000
 
 final_weights = [inf for i in range(v)]
+final_weights[c] = 0
 
 start = c 
-
-dist = [inf]*v 
-dist[c] = 0  
 
 isNotProbed = [i for i in range(v)]
 
@@ -47,16 +40,11 @@ for trio in range(e):
     adjMat[node1][node2] = weight 
     adjMat[node2][node1] = weight 
 
-probeNode(c, start) 
-
-while isNotProbed != []: 
-    toProbe = nextNode(final_weights) 
-
-    probeNode(toProbe,start)
-
-
-print(final_weights)
-print(isNotProbed)
+for i in range(v): 
+    x = int(input())
+    probeNode(x,start)
+    print(final_weights)
+    print(isNotProbed)
 
 #TESTING 
 
