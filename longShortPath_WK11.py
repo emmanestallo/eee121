@@ -40,11 +40,12 @@ for trio in range(e):
     adjMat[node1][node2] = weight 
     adjMat[node2][node1] = weight 
 
-for i in range(v): 
-    x = int(input())
-    probeNode(x,start)
+for i in range(v):
+    n = int(input())
+    probeNode(n,start)
     print(final_weights)
     print(isNotProbed)
+
 
 #TESTING 
 
