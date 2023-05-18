@@ -1,8 +1,8 @@
 def probeNode(node,startNode):
     #set current node
-    if isProbed[node] == False: 
+    if node in isNotProbed: 
         currNode = node 
-        isProbed[currNode] = True 
+        isNotProbed.remove(node)
 
         if currNode == startNode:
             cost = 0
@@ -15,7 +15,11 @@ def probeNode(node,startNode):
                 if adjMat[currNode][neighbor] + cost < final_weights[neighbor]: 
                     final_weights[neighbor] = adjMat[currNode][neighbor] + cost 
 
+def nextNode(arr): 
+    minVal = min(arr) 
+    minIdx = arr.index(minVal) 
 
+    return minIdx 
 
 v,e,c = [int(i) for i in input().split(' ')]
 
@@ -28,7 +32,7 @@ start = c
 dist = [inf]*v 
 dist[c] = 0  
 
-isProbed = [False]*v 
+isNotProbed = [i for i in range(v)]
 
 adjMat = [] 
 
@@ -43,10 +47,16 @@ for trio in range(e):
     adjMat[node1][node2] = weight 
     adjMat[node2][node1] = weight 
 
-probeNode(c, start)
+probeNode(c, start) 
+
+while isNotProbed != []: 
+    toProbe = nextNode(final_weights) 
+
+    probeNode(toProbe,start)
+
 
 print(final_weights)
-print(isProbed)
+print(isNotProbed)
 
 #TESTING 
 
