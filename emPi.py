@@ -32,7 +32,7 @@ class resistorNetwork:
             result = 'PARALLEL'
         else:
             result = 'NULL'
-        return result 
+        print(result) 
 
 resNet = resistorNetwork() 
 
@@ -41,6 +41,11 @@ for j in range(n):
     resName,start,end,value = [j for j in input().split(" ")]
     value = float(value)
     resNet.addElement(spiceLine(resName,start,end,value)) 
+
+for k in range(q): 
+
+    resNet.checkParallel()
+
 
 a = resNet.checkParallel
 print(a)
