@@ -21,7 +21,7 @@ class resistorNetwork:
         for element in self.elements:
             print(type(element.edgeName))  
 
-    def checkParallel(self,input1,input2):
+    def isParallel(self,input1,input2):
         result = ''
         in_test = []
         for element in self.elements: 
@@ -42,12 +42,7 @@ for j in range(n):
     value = float(value)
     resNet.addElement(spiceLine(resName,start,end,value)) 
 
+
 for k in range(q): 
-
-    resNet.checkParallel()
-
-
-a = resNet.checkParallel
-print(a)
-
-
+    one,two = [u for u in input().split(" ")]
+    resNet.isParallel(one,two)
