@@ -1,0 +1,18 @@
+def quad(arr):
+    n = len(arr)
+    if n == 1:
+        return arr[0]
+    if n < 1:
+        return -1
+    beg, mid, end = 0, n//2, n
+    qu = quad(arr[beg:mid])
+    ad = quad(arr[mid:end])
+
+    return qu if qu > ad else ad
+
+setList = []
+vals = input().split(" ")
+for i in vals: 
+    setList.append(int(i)) 
+
+print(quad(setList))

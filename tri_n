@@ -1,0 +1,10 @@
+def tri(n):
+    if n == 1:
+        return [1]
+    prev = [0] + tri(n-1)
+    for i in range(len(prev)-1):
+        prev[i] = prev[i] + prev[i+1]
+    return prev 
+
+n = int(input())
+print(tri(n))
