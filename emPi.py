@@ -18,17 +18,18 @@ class resistorNetwork:
         self.elements.append(element) 
 
     def viewNetwork(self): 
-        for num in range(len(self.elements)):
-            print(self.elements[num].edgeWeight)
+        for element in self.elements:
+            print(type(element.edgeName))
 
 
-            
+
 
 resNet = resistorNetwork() 
 
 n,q = [int(i) for i in input().split(" ")]
 for j in range(n): 
     resName,start,end,value = [j for j in input().split(" ")]
+    value = float(value)
     resNet.addElement(spiceLine(resName,start,end,value)) 
 
 resNet.viewNetwork()
