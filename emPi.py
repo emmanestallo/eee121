@@ -10,6 +10,7 @@ class spiceLine:
 class resistorNetwork: 
 
     elements = []
+    isVisited = []
 
     def __init__(self): 
         pass
@@ -21,18 +22,28 @@ class resistorNetwork:
         for element in self.elements:
             print(type(element.edgeName))  
 
-    def isParallel(self,input1,input2):
-        result = ''
-        in_test = []
-        for element in self.elements: 
-            if element.edgeName == input1 or element.edgeName == input2: 
-                in_test.append(element)
-        a,b = in_test[0],in_test[1]
-        if a.node1 == b.node1 and a.node2 == b.node2: 
-            result = 'PARALLEL'
-        else:
-            result = 'NULL'
-        print(result) 
+    def isParallel(self):
+        parallelNodes = [] 
+        toCheck = 0
+        for elem in range(len(self.elements)):
+            self.isVisited.append(False) 
+        for idx in range(len(self.elements)):
+            if self.isVisited[idx] == False:
+                toCheck = self.elements[idx]
+                n1,n2 = toCheck.node1, toCheck.node2
+                self.isVisited[idx] = True 
+                for _ in range(idx+1,len(self.elements)):
+                    m1,m2 = self.elements[_].node1, self.elements[_].node2
+                    if [m1,m2] == [n1,n2]:
+                        self.isVisited[_] = True
+                        parallelNodes.append([self.elements[idx].edgeName, self.elements[_].edgeName])
+        return parallelNodes 
+            
+
+
+
+
+
 
 resNet = resistorNetwork() 
 
@@ -42,7 +53,5 @@ for j in range(n):
     value = float(value)
     resNet.addElement(spiceLine(resName,start,end,value)) 
 
-
-for k in range(q): 
-    one,two = [u for u in input().split(" ")]
-    resNet.isParallel(one,two)
+a = resNet.isParallel()
+print(a)
