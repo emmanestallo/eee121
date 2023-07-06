@@ -28,6 +28,18 @@ def create_pairwise(resList,storage):
             storage.append((resList[j],resList[i]))
     return
 
+def ends_in_diverging(connectors, node):
+    diverging = False 
+    if len(connectors[node]) > 1:
+        diverging = True 
+    return diverging 
+
+def ends_in_converging(connectors, node):
+    converging = False 
+    if len(connectors[node]) > 1:
+        converging = True 
+    return converging 
+
 
 def traverse_from_start(conn_edges,graph,node): 
     series_resistors = [] 
@@ -39,9 +51,13 @@ def traverse_from_start(conn_edges,graph,node):
     stack = [] 
 
     stack.append(node) 
+
+    #to implement
+    #visited = set of traversed edges instead of visited nodes
     visited = set()
 
     series_streak = [] 
+    diverging_node = 0
 
     while len(stack) != 0: 
 
@@ -70,6 +86,18 @@ def traverse_from_start(conn_edges,graph,node):
                     series_streak.clear()
                 if can_be_series:
                     series_streak += conn_edges[(current_node,neighbor)]
+                    if ends_in_converging:
+                        stack.append(diverging_node)
+                        if len(series_streak) > 1:
+                            if series_streak not in series_resistors:
+                                series_resistors.append(series_streak)
+                        series_streak.clear()
+                    if ends_in_diverging:
+                        diverging_node = neighbor
+                        if len(series_streak) > 1:
+                            if series_streak not in series_resistors:
+                                series_resistors.append(series_streak)
+                        series_streak.clear()
 
         if len(series_streak) > 1:
             if series_streak not in series_resistors:
@@ -92,6 +120,8 @@ def create_adjList(input_dict):
 resistor_network = {} 
 resistances = {} 
 connecting_edges = defaultdict(list) 
+to_diverge = defaultdict(list)
+to_converge = defaultdict(list)
 
 #n,q = [int(i) for i in input().split(" ")]
 
@@ -103,6 +133,8 @@ for j in range(n):
     resistor_network[resName] = [start, end] 
     resistances[resName] = value 
     connecting_edges[(start,end)].append(resName) 
+    to_diverge[start].append(resName)
+    to_converge[end].append(resName)
 
 res_graph = create_adjList(resistor_network) 
 
@@ -123,8 +155,6 @@ for element in total_resistances:
 
 for resists, values in total_resistances:
     print(f'[' + ', '.join(resists) + ']', f'{int(values)}')
-
-
 
 
 '''
