@@ -10,7 +10,10 @@ class spiceLine:
 class resistorNetwork: 
 
     elements = []
-    isVisited = []
+    parallelNodes = [] 
+    seriesNodes = [] 
+    isCheckedP = []
+    isCheckedS = [] 
 
     def __init__(self): 
         pass
@@ -23,25 +26,29 @@ class resistorNetwork:
             print(type(element.edgeName))  
 
     def isParallel(self):
-        parallelNodes = [] 
         toCheck = 0
-        for elem in range(len(self.elements)):
-            self.isVisited.append(False) 
         for idx in range(len(self.elements)):
-            if self.isVisited[idx] == False:
-                toCheck = self.elements[idx]
-                n1,n2 = toCheck.node1, toCheck.node2
-                self.isVisited[idx] = True 
-                for _ in range(idx+1,len(self.elements)):
-                    m1,m2 = self.elements[_].node1, self.elements[_].node2
-                    if [m1,m2] == [n1,n2]:
-                        self.isVisited[_] = True
-                        parallelNodes.append([self.elements[idx].edgeName, self.elements[_].edgeName])
-        return parallelNodes 
+            toCheck = self.elements[idx]
+            n1,n2 = toCheck.node1, toCheck.node2
+            for _ in range(idx+1,len(self.elements)):
+                m1,m2 = self.elements[_].node1, self.elements[_].node2
+                if [m1,m2] == [n1,n2]:
+                    self.parallelNodes.append([self.elements[idx].edgeName, self.elements[_].edgeName])
+                    self.parallelNodes.append([self.elements[_].edgeName, self.elements[idx].edgeName])
+        return self.parallelNodes 
             
-
-
-
+    def isSeries(self):
+        toCheck = 0
+        for idx in range(len(self.elements)):
+            toCheck = self.elements[idx]
+            n1,n2 = toCheck.node1, toCheck.node2
+            for _ in range(idx+1,len(self.elements)):
+                m1,m2 = self.elements[_].node1, self.elements[_].node2
+                x = [i for i in [n1,n2] if i in set([m1,m2])]
+                if len(x) == 1 and 'Vdd' not in x and 'GND' not in x:
+                    self.seriesNodes.append([self.elements[idx].edgeName, self.elements[_].edgeName])
+                    self.seriesNodes.append([self.elements[_].edgeName, self.elements[idx].edgeName])
+        return self.seriesNodes 
 
 
 
@@ -54,4 +61,14 @@ for j in range(n):
     resNet.addElement(spiceLine(resName,start,end,value)) 
 
 a = resNet.isParallel()
-print(a)
+b = resNet.isSeries()
+
+
+for i in range(q):
+    n1,n2 = input().split(" ")
+    if [n1,n2] in a:
+        print('PARALLEL') 
+    elif [n1,n2] in b: 
+        print("SERIES")
+    else:
+        print("NEITHER")

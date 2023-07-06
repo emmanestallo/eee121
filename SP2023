@@ -1,0 +1,16 @@
+class Resistor: 
+    def __init__(self,edgeName,node1,node2,edgeWeight):
+        self.edgeName = edgeName 
+        self.node1 = node1 
+        self.node2 = node2 
+        self.edgeWeight = edgeWeight  
+
+resistorNetwork = [] 
+
+n,q = [int(i) for i in input().split(" ")]
+for j in range(n): 
+    resName,start,end,value = [j for j in input().split(" ")]
+    value = float(value)
+    resistorNetwork.append(Resistor(resName,start,end,value)) 
+
+print(resistorNetwork)
