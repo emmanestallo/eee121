@@ -1,5 +1,6 @@
 from collections import defaultdict
 
+#checks if two branches are parallel by counterchecking it with the "con_edges object"
 def is_parallel(node1,node2,con_edges):
     parallel = False 
     if len(con_edges[(node1,node2)]) > 1:
@@ -7,12 +8,14 @@ def is_parallel(node1,node2,con_edges):
 
     return parallel
 
+#ser_res is a list containing all the consecutively traversed branches 
 def get_total_series_resistance(ser_res,values):
     total_series_resistance = 0
     for i in ser_res:
         total_series_resistance += values[i] 
     return total_series_resistance
 
+#par_res is a list containing all the parallel branches 
 def get_total_parallel_resistance(par_res,values):
     total_conductance = 0 
     for j in par_res:
@@ -20,7 +23,7 @@ def get_total_parallel_resistance(par_res,values):
     total_parallel_resistance = 1/total_conductance
     return total_parallel_resistance
 
-
+#just a function to create all the possible pairs of series or parallel resistors 
 def create_pairwise(resList,storage):
     for i in range(len(resList)):
         for j in range(i+1, len(resList)):
@@ -28,24 +31,32 @@ def create_pairwise(resList,storage):
             storage.append((resList[j],resList[i]))
     return
 
-def ends_in_diverging(connectors, node):
+#checks if the branch diverges from a node 
+def is_diverging(connectors, node):
     diverging = False 
     if len(connectors[node]) > 1:
         diverging = True 
     return diverging 
 
-def ends_in_converging(connectors, node):
+#checks if the branches converge to a node 
+def is_converging(connectors, node):
     converging = False 
     if len(connectors[node]) > 1:
         converging = True 
     return converging 
 
+#checks if the branch is traversed 
+def is_traversed(node1,node2,conedges,set):
+    traversed = False
+    for resistor in conedges[(node1,node2)]:
+        if resistor in set:
+            traversed = True 
+    return traversed
 
+#main function 
 def traverse_from_start(conn_edges,graph,node): 
     series_resistors = [] 
     parallel_resistors = [] 
-
-    start_node = node 
 
     #implements depth first search 
     stack = [] 
@@ -57,26 +68,28 @@ def traverse_from_start(conn_edges,graph,node):
     visited = set()
 
     series_streak = [] 
-    diverging_node = 0
+    diverging_node = node
 
     while len(stack) != 0: 
-
         current_node = stack.pop()
-        
-        if current_node not in [f'{start_node}','GND']:
-            visited.add(current_node)
-
         if current_node == 'GND':
-            if len(graph) > 1:
-                stack.append(f'{start_node}')
+            stack.append('Vdd')
+#        if current_node not in [f'{start_node}','GND']:
+#            visited.add(current_node)
 
+#       if current_node == 'GND':
+#           if len(graph) > 1:
+#               stack.append(f'{start_node}')
         for neighbor in graph[current_node]:
-            if neighbor not in visited and neighbor not in stack:
+            if not is_traversed(current_node,neighbor,connecting_edges,visited) and neighbor not in stack:
                 stack.append(neighbor)
-            if neighbor not in visited: 
+            if not is_traversed(current_node,neighbor,connecting_edges,visited): 
                 can_be_series = True 
                 #series_streak += conn_edges[(current_node,neighbor)]
                 if is_parallel(current_node,neighbor,conn_edges):
+                    #to add edge to set of visited edges
+                    for elem in conn_edges[(current_node,neighbor)]:
+                        visited.add(elem)
                     can_be_series = False
                     if len(series_streak) > 1: 
                         if series_streak not in series_resistors:
@@ -86,14 +99,15 @@ def traverse_from_start(conn_edges,graph,node):
                     series_streak.clear()
                 if can_be_series:
                     series_streak += conn_edges[(current_node,neighbor)]
-                    if ends_in_converging:
+                    if is_converging(to_converge,neighbor):
                         stack.append(diverging_node)
                         if len(series_streak) > 1:
                             if series_streak not in series_resistors:
                                 series_resistors.append(series_streak)
                         series_streak.clear()
-                    if ends_in_diverging:
+                    if is_diverging(to_diverge,neighbor):
                         diverging_node = neighbor
+                        stack.append(diverging_node)
                         if len(series_streak) > 1:
                             if series_streak not in series_resistors:
                                 series_resistors.append(series_streak)
@@ -106,7 +120,7 @@ def traverse_from_start(conn_edges,graph,node):
         
     return series_resistors, parallel_resistors
 
-
+#creates the graph object 
 def create_adjList(input_dict): 
     adjList = defaultdict(list)
     for res, (n1,n2) in input_dict.items():
@@ -152,7 +166,8 @@ for element in total_resistances:
     if element[0] == []:
         del(total_resistances[0])
 
-
+print(to_converge)
+print(to_diverge)
 for resists, values in total_resistances:
     print(f'[' + ', '.join(resists) + ']', f'{int(values)}')
 
