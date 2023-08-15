@@ -166,8 +166,6 @@ for element in total_resistances:
     if element[0] == []:
         del(total_resistances[0])
 
-print(to_converge)
-print(to_diverge)
 for resists, values in total_resistances:
     print(f'[' + ', '.join(resists) + ']', f'{int(values)}')
 
