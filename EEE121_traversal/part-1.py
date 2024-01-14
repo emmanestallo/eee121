@@ -27,43 +27,53 @@ def canBeVisited(node, visited):
 
 def traverseFromNode(start_point):
     stack = list()
-    visited_edges = set() 
+    visited_edges = list()
 
     series_ongoing = list()
     series_stack = list()
     parallel_stack = list()
 
+    previous_node = start_point
+
     stack.append(start_point)
     while len(stack) != 0: 
         current_node = stack.pop() 
+
         #checks if the next nodes can be appended to the stack
         for succeeding_node in graph[current_node]:
-            if canBeVisited(succeeding_node, visited_edges):
-                stack.append(succeeding_node)
-            elif not canBeVisited(succeeding_node, visited_edges):
-                connecting_res = connecting_edges[(current_node,succeeding_node)]
-                count = 0 
-                for edge in connecting_res: 
-                    visited_edges.append(edge)
-                    count = count + 1 
-                if count > 1:
-                    parallel_stack.append([edge for edge in connecting_res]) 
 
+            if succeeding_node == 'GND':
+                stack.append(succeeding_node)
+            else: 
+                if canBeVisited(succeeding_node, visited_edges):
+                    stack.append(succeeding_node)
+                elif not canBeVisited(succeeding_node, visited_edges):
+                    connecting_res = connecting_edges[(current_node,succeeding_node)]
+                    count = 0 
+                    for edge in connecting_res: 
+                        visited_edges.append(edge)
+                        count = count + 1 
+                    if count > 1:
+                        parallel_stack.append([edge for edge in connecting_res]) 
+                        
         if current_node == 'Vdd':
-            current_node = stack.pop()
+            continue
 
         if len(ending_to[current_node]) == 1:
             series_ongoing.append(ending_to[current_node][0]) 
-        else:
+            visited_edges.append(ending_to[current_node][0])
+        elif len(ending_to[current_node]) > 1:
+            if len(series_ongoing) > 1:
+                series_stack.append(series_ongoing)
             series_ongoing.clear()
-            if isSameStarting[current_node]:
-                
+            to_check = connecting_edges[(previous_node,current_node)]
+            if len(to_check) > 1:
+                parallel_stack.append([edge for edge in to_check])
 
-        
+        print(series_ongoing)
+        previous_node = current_node
 
-    
-
-
+    return series_stack, parallel_stack, visited_edges
 
 
 
@@ -100,4 +110,8 @@ while count <= n:
     ending_to[end].append(resName) 
     count = count+1 
 
-print(graph)
+
+ser, par, vis = traverseFromNode('Vdd')
+
+print(ser)
+print(par)
