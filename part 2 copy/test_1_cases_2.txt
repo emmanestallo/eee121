@@ -1,0 +1,16 @@
+5 10
+R1 Vdd a 10000
+R2 a b 2000
+R3 b c 300
+R4 c d 40
+R5 d GND 5
+R1 R2
+R1 R3
+R1 R4
+R1 R5
+R2 R3
+R2 R4
+R2 R5
+R3 R4
+R3 R5
+R4 R5
