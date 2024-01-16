@@ -1,5 +1,47 @@
 from collections import defaultdict
 
+# counts the edges that connect the same two nodes
+# https://stackoverflow.com/questions/22737978/parallel-edge-detection
+def parallel_generate_edges(edgeList):
+    edge_counts = {}
+    
+    for edge in edgeList:
+        edge_counts[edge] = edge_counts.get(edge, 0) + 1
+
+    # find edges that appear more than once (parallel edges)
+    parallel_edges = [edge for edge, count in edge_counts.items() if count > 1]
+    
+    return parallel_edges 
+
+
+# for the linked list idea, the following sources were used
+
+# https://stackoverflow.com/questions/14022701/good-data-structure-for-representing-multigraph-c 
+# https://stackoverflow.com/questions/71653546/linked-list-keeping-track-of-each-node
+
+
+# finds all the series connections using iteration
+# essentially gets the longest streak from a linked list
+def find_all_series_streaks(series_linked_list):
+    visited = set()
+    series_connections = []
+
+    for key in series_linked_list:
+        if key not in visited:
+            current_element = key
+            current_streak = []
+
+            while current_element is not None and current_element not in visited:
+                visited.add(current_element)
+                current_streak.append(current_element)
+
+                current_element = series_linked_list.get(current_element)
+
+            series_connections.append(current_streak)
+            
+    return series_connections
+
+
 # input parameter are resistor names and resistor network
 # ouputs a boolean value indicating whether the two resistors are in parallel
 def parallel_identify_connection(r1 , r2, resistor_network):
@@ -8,10 +50,6 @@ def parallel_identify_connection(r1 , r2, resistor_network):
 
     return set(edge_r1) == set(edge_r2)
 
-# for the linked list idea, the following sources were used
-
-# https://stackoverflow.com/questions/14022701/good-data-structure-for-representing-multigraph-c 
-# https://stackoverflow.com/questions/71653546/linked-list-keeping-track-of-each-node
 
 # input parameters are resistor names and resistor network
 # outputs a boolean value indicating whether the two resistors are immediately in series
@@ -29,6 +67,7 @@ def series_identify_immediate_connection(r1, r2, resistor_network, starting_from
         return (len(ending_to[start_r1]) <= 1) and (len(starting_from[start_r1]) <= 1)
     else :
         return False
+
 
 # output is a dictionary of resistors that are in series
 # key points to the resistor that is immediately in series
@@ -65,6 +104,7 @@ def series_identify_connection(r1, r2, series_linked_list):
 
     return False
 
+
 def identify_connection_type(r1, r2, series_linked_list):
     if series_identify_connection(r1, r2, series_linked_list):
         return "SERIES"
@@ -72,13 +112,13 @@ def identify_connection_type(r1, r2, series_linked_list):
         return "PARALLEL"
     else: 
         return "NEITHER"
+    
 
-series_linked_list = None
 
 count = 0
 
 n = 0
-q = 0
+
 resistor_network = {}
 resistances = {}
 connecting_edges = defaultdict(list)
@@ -87,28 +127,47 @@ ending_to = defaultdict(list)
 edges_list = []
 
 
-
 if count == 0:
-    n,q = [int(i) for i in input().split(" ")] 
-    count = count + 1
+    n = int(input())
+    count = count+1
 
-while count <= n + q:
-    if count > int(n):
-        res1, res2 = input().replace("\n", "").split(" ")
-            
-        if series_linked_list is None:
-            series_linked_list = series_generate_linked_list(resistor_network, starting_from, ending_to)
-            
-        print(identify_connection_type(res1, res2, series_linked_list))
-        count = count + 1
+while count <= n:
+    resName, start, end, value = input().split()
+    value = float(value)
+    resistor_network[resName] = [start, end]
+    resistances[resName] = value
+    connecting_edges[(start, end)].append(resName)
+    starting_from[start].append(resName)
+    ending_to[end].append(resName)
+    edges_list.append((start, end)) 
+    count = count+1
+    
+
+parallel_edges = parallel_generate_edges(edges_list)
+
+a = series_generate_linked_list(resistor_network, starting_from, ending_to) 
+series_streaks = find_all_series_streaks(a) 
+
+
+for streak in series_streaks:
+    total_res = 0 
+    for res in streak:
+        total_res += resistances[res] 
+
+    print(str(sorted(streak)).replace("'", ""), int(total_res))
+
+for edge in parallel_edges:
+    res_value = 0
+    resistors = connecting_edges[edge]
+    for node in resistors:
+        res_value += 1/resistances[node]
+    
+    print(str(sorted(resistors)).replace("'", ""), int(1/res_value))  
+
+
+
+    
+
         
-    else:
-        resName, start, end, value = input().split()
-        value = float(value)
-        resistor_network[resName] = [start, end]
-        resistances[resName] = value
-        connecting_edges[(start, end)].append(resName)
-        starting_from[start].append(resName)
-        ending_to[end].append(resName)
-        edges_list.append((start, end))
-        count = count + 1
+
+
